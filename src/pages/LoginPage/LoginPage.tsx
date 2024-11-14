@@ -32,6 +32,7 @@ export const LoginPage = () => {
     formState: { errors },
   } = useForm({
     resolver: yupResolver(loginFormSchema),
+    mode: "onBlur",
     defaultValues: {
       useremail: "",
       userpassword: "",
@@ -39,22 +40,25 @@ export const LoginPage = () => {
   });
 
   const navigate = useNavigate();
- 
-  // const [loginUser, { data: userData }] = useLoginUserMutation();
+  const [loginUser, { data: userData }] = useLoginUserMutation();
 
   const onLoginSubmit: SubmitHandler<ILoginForm> = (data) => {
-    
+    const payload = {
+      email: data.useremail,
+      password: data.userpassword,
+    };
+    loginUser(payload);
   };
 
-  // useEffect(() => {
-  //   console.log(userData)
+  useEffect(() => {
+    console.log(userData);
 
-  //   if (userData?.user_id) {
-  //     navigate("/main");
-  //     localStorage.setItem('userLoginData', JSON.stringify(userData.user_id))
-  //   }
-  // }, [userData, navigate]);
-
+    if (userData?.user_id) {
+      navigate("/main");
+      localStorage.setItem("userLoginData", JSON.stringify(userData.user_id));
+    }
+  }, [userData, navigate]);
+  let hasError = !!Object.keys(errors).length;
   return (
     <Container>
       <StyledLoginPage>
@@ -87,7 +91,7 @@ export const LoginPage = () => {
             )}
           />
           <Button
-            disabled={!!Object.keys(errors).length}
+            disabled={hasError}
             isPrimary
             type="submit"
             buttonText="Войти"
